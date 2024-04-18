@@ -1,0 +1,85 @@
+Intial scan shows ports 139,445,22, and 80
+
+Visiting 80 gives us the default Apache splash page
+
+
+
+
+Checking dirbuster yields nothing. So I looked through the SMB scan from autorecon.
+
+Theres a server shared dir and we have write access!
+
+
+
+I used smbclient to connect to the share
+
+smbclient //192.168.1.74/server 
+
+Looking at the contents shows that this is the web root!
+
+
+
+Lets upload a php reverse shell and see what we get.
+
+I use the PHP reverse shell from pentestmonkey but you can take your pick.
+
+I make my changes to shell.php
+
+
+
+Then upload with smbclient
+
+
+
+Start a listener (I prefer penelope, but NC will do if you prefer.
+
+
+
+I started my listener, visited the page in the browser, and got a shell.
+
+
+First thing I do is check sudo -l
+
+
+
+A user named s3cur4 can run /usr/bin/bash with sudo, we just need to become s3cur4.
+
+Well this is easy. We issue the command:
+
+sudo -u s3cur4 /usr/bin/bash
+
+We are now s3cur4
+
+
+
+cd into s3cur4's home dir and the user.txt is there
+
+
+
+Checking sudo -l again shows that s3cur4 can run /usr/bin/apt as root. So lets take a look at GTFOBins
+
+
+
+Search for apt and you will see that there is a entry for sudo
+
+
+
+Clicking sudo takes us to the info
+
+
+
+
+So we issue the command:
+
+sudo apt changelog apt
+!/bin/sh
+
+Apt will do its thing and when complete, we are dropped a sh shell.
+
+
+
+Checking the user with id shows that we are now root.
+
+
+
+Thats it! 
